@@ -1,0 +1,19 @@
+{
+  "po_number": "PO-2024-TEST",
+  "imported_at": "2026-03-09T15:00:00Z",
+  "source_file": "test_po.pdf",
+  "lines": [
+    {
+      "HizmetKodu": "P123456",
+      "OrderQty": "10",
+      "Price": "150.00",
+      "NetValue": "1500.00"
+    },
+    {
+      "HizmetKodu": "P789012",
+      "OrderQty": "25",
+      "Price": "200.00",
+      "NetValue": "5000.00"
+    }
+  ]
+}
