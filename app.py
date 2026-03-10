@@ -175,6 +175,11 @@ if uploaded_file is not None:
                     except Exception as e:
                         st.error(f"❌ An unexpected error occurred: {str(e)}")
                         st.exception(e)
+        
+        except Exception as e:
+            st.error(f"❌ Processing failed: {str(e)}")
+            st.exception(e)
+
 # ============================================================================
 # NEW SECTION: JSON Export for Auto-Import
 # ============================================================================
@@ -464,10 +469,6 @@ if SHAREPOINT_AVAILABLE:
         1. Configure secrets in Streamlit Cloud settings
         2. See `.streamlit/secrets.toml.example` for required values
         """)
-
-        except Exception as e:
-            st.error(f"❌ An unexpected error occurred: {str(e)}")
-            st.exception(e)
 
 
 
