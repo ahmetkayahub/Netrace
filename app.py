@@ -159,22 +159,22 @@ if uploaded_file is not None:
                             df = pd.DataFrame(details)
                             st.dataframe(df, use_container_width=True)
                             
-                            # Download as CSV
-                            csv = df.to_csv(index=False)
-                            st.download_button(
-                                label="📥 Download as CSV",
-                                data=csv,
-                                file_name="p_code_details.csv",
-                                mime="text/csv"
-                            )
-                        else:
-        except ValueError as e:
-            st.error(f"❌ Error: {str(e)}")
-        except Exception as e:
-            st.error(f"❌ An unexpected error occurred: {str(e)}")
-            st.exception(e)
-
-
+                        # Download as CSV
+                        csv = df.to_csv(index=False)
+                        st.download_button(
+                            label="📥 Download as CSV",
+                            data=csv,
+                            file_name="p_code_details.csv",
+                            mime="text/csv"
+                        )
+                    else:
+                        st.warning("⚠️ No P codes with details found in the uploaded PDF")
+                    
+                    except ValueError as e:
+                        st.error(f"❌ Error: {str(e)}")
+                    except Exception as e:
+                        st.error(f"❌ An unexpected error occurred: {str(e)}")
+                        st.exception(e)
 # ============================================================================
 # NEW SECTION: JSON Export for Auto-Import
 # ============================================================================
