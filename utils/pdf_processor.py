@@ -2,7 +2,7 @@
 
 import fitz  # PyMuPDF
 import re
-from typing import Set, Optional, List, Dict
+from typing import Set, Optional
 import io
 
 
@@ -214,105 +214,5 @@ def highlight_uploaded_pdf(uploaded_pdf_file, master_pdf_codes: Set[str]) -> io.
     
     except Exception as e:
         raise ValueError(f"Error highlighting uploaded PDF: {str(e)}")
-
-
-def extract_p_codes_with_details(pdf_file) -> List[Dict]:
-    """
-    Extracts P codes with order details (qty, price, net value) from PDF.
-    
-    Args:
-        pdf_file: PDF file (file-like object or bytes)
-    
-    Returns:
-        List[Dict]: List of dictionaries with P code details
-        Example: [
-            {
-                'p_code': 'P123456',
-                'order_qty': '10',
-                'price_per_unit': '150.00',
-                'net_value_eur': '1,500.00'
-            }
-        ]
-    
-    Raises:
-        ValueError: If PDF cannot be read
-    """
-    results = []
-    
-    try:
-        # Read PDF from memory
-        if isinstance(pdf_file, bytes):
-            pdf_bytes = pdf_file
-        else:
-            pdf_file.seek(0)
-            pdf_bytes = pdf_file.read()
-        
-        # Open PDF
-        pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
-        
-        # Regex pattern: P + exactly 6 digits
-        pattern = re.compile(r'P\d{6}')
-        
-        # Process each page
-        for page_num in range(len(pdf_document)):
-            page = pdf_document[page_num]
-            
-            # Get text with position information
-            words = page.get_text("words")  # Returns list of (x0, y0, x1, y1, "word", block_no, line_no, word_no)
-            
-            # Find P codes
-            for i, word in enumerate(words):
-                text = word[4]
-                
-                # Check if this word matches P code pattern
-                if pattern.fullmatch(text):
-                    p_code = text
-                    y_coord = word[1]  # Y coordinate of P code
-                    x_coord = word[0]  # X coordinate of P code
-                    
-                    # Find words on the same line (within 5 pixel tolerance)
-                    same_line_words = [
-                        w for w in words 
-                        if abs(w[1] - y_coord) < 5  # Same line
-                    ]
-                    
-                    # Sort by X position (left to right)
-                    same_line_words.sort(key=lambda w: w[0])
-                    
-                    # Extract values (typically: qty, price, net value are to the right of P code)
-                    line_texts = [w[4] for w in same_line_words]
-                    
-                    # Try to find numeric values on the right side of P code
-                    p_code_index = next((idx for idx, w in enumerate(same_line_words) if w[4] == p_code), None)
-                    
-                    if p_code_index is not None:
-                        # Get values after P code
-                        values_after = [w[4] for w in same_line_words[p_code_index + 1:]]
-                        
-                        # Extract numeric values (remove non-numeric items)
-                        numeric_values = []
-                        for val in values_after:
-                            # Check if value contains numbers (qty, price, net value)
-                            if re.search(r'\d', val):
-                                numeric_values.append(val)
-                        
-                        # Typically: first = qty, second = price, third = net value
-                        order_qty = numeric_values[0] if len(numeric_values) > 0 else ''
-                        price_per_unit = numeric_values[1] if len(numeric_values) > 1 else ''
-                        net_value_eur = numeric_values[2] if len(numeric_values) > 2 else ''
-                        
-                        results.append({
-                            'p_code': p_code,
-                            'order_qty': order_qty,
-                            'price_per_unit': price_per_unit,
-                            'net_value_eur': net_value_eur
-                        })
-        
-        pdf_document.close()
-        return results
-    
-    except Exception as e:
-        raise ValueError(f"Error extracting P code details: {str(e)}")
-
 
 

@@ -38,8 +38,7 @@ ENV/
 Thumbs.db
 
 # Streamlit
-.streamlit/secrets.toml
-.streamlit/config.toml
+.streamlit/
 
 # Data (optional - remove if you want to include ana_pdf.pdf)
 # data/*.pdf
